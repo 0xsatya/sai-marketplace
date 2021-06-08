@@ -11,10 +11,10 @@ import detectEthereumProvider from "@metamask/detect-provider";
 
 function App() {
   const [currentPage, setCurrentPage] = useState("ethWallet");
-  let [message, setMessage] = useState(undefined);
+  let [message, setMessage] = useState("Loading...");
 
   // const [accounts, setAccounts] = useState(undefined);
-  const [currentAccount, setCurrentAccount] = useState('0x0');
+  const [currentAccount, setCurrentAccount] = useState("0x0");
   const [currentNetworkId, setCurrentNetworkId] = useState(undefined);
   const [currentChainId, setCurrentChainId] = useState(undefined);
 
@@ -23,96 +23,105 @@ function App() {
   // const [provider, setProvider] = useState(undefined); //web3provider
   const [web3, setWeb3] = useState(undefined);
   let ethereum = null;
-  const [color, setColor] = useState('#fafafd');
-  const [headerClass, setHeaderClass] = useState('moduleSelector')
+  const [color, setColor] = useState("#fafafd");
+  const [headerClass, setHeaderClass] = useState("moduleSelector");
 
   function handleAccountsChanged(accounts) {
+    console.log("handleAccountsChanged called..", accounts);
     if (accounts.length === 0) {
       // MetaMask is locked or the user has not connected any accounts
       console.log("Please connect to MetaMask.");
+      setMessage(
+        "Please connect to Metamask Kovan network and refresh page..."
+      );
     } else if (accounts[0] !== currentAccount) {
       setCurrentAccount(accounts[0]);
-      console.log("handleAccountsChanged:--", accounts);
+      console.log("Current account has been changed to:--", accounts[0]);
       // Do any other work!
     }
   }
 
   function handleChainChanged(_chainId) {
     let chainId = parseInt(_chainId);
-    if (chainId !== currentChainId) {
-      console.log("handleChainChanged:", chainId);
-      setCurrentChainId(chainId);
-    }
-    // We recommend reloading the page, unless you must do otherwise
-    // window.location.reload();
+    console.log("handleChainChanged called...", _chainId, currentChainId);
+    window.location.reload();
   }
 
-  const startApp = useCallback(async (provider) => {
-    // If the provider returned by detectEthereumProvider is not the same as
-    // window.ethereum, something is overwriting it, perhaps another wallet.
-    if (provider !== window.ethereum) {
-      console.error("Do you have multiple wallets installed?");
-    } else ethereum = window.ethereum;
+  // const startApp = useCallback(async (provider) => {});
 
-    console.log("provider", provider);
-    // Access the decentralized web!
-
-    /**********************************************************/
-    /* Handle chain (network) and chainChanged (per EIP-1193) */
-    /**********************************************************/
-
-    const chainId = await ethereum.request({ method: "eth_chainId" });
-    handleChainChanged(chainId);
-    ethereum.on("chainChanged", handleChainChanged);
-
-    /***********************************************************/
-    /* Handle user accounts and accountsChanged (per EIP-1193) */
-    /***********************************************************/
-
-    ethereum
-      .request({ method: "eth_accounts" })
-      .then(handleAccountsChanged)
-      .catch((err) => {
-        // Some unexpected error.
-        // For backwards compatibility reasons, if no accounts are available,
-        // eth_accounts will return an empty array.
-        console.error(err);
-      });
-
-    // Note that this event is emitted on page load.
-    // If the array of accounts is non-empty, you're already
-    // connected.
-    ethereum.on("accountsChanged", handleAccountsChanged);
-  });
-
-  const listenScrollEvent = e => {
-    if (window.scrollY > 180) {
-      setHeaderClass('moduleSelector1');
+  const listenScrollEvent = (e) => {
+    // console.log(window.scrollY);
+    if (window.scrollY > 80) {
+      setHeaderClass("moduleSelector1");
     } else {
-      setHeaderClass('moduleSelector');
+      setHeaderClass("moduleSelector");
     }
-  }
+  };
 
   useEffect(() => {
-    window.addEventListener('scroll', listenScrollEvent)
+    window.addEventListener("scroll", listenScrollEvent);
     const init = async () => {
       const provider = await detectEthereumProvider();
       if (provider) {
-        startApp(provider);
+        // If the provider returned by detectEthereumProvider is not the same as
+        // window.ethereum, something is overwriting it, perhaps another wallet.
+        if (provider !== window.ethereum) {
+          console.error("Do you have multiple wallets installed?");
+          setMessage("Do you have multiple wallets installed?");
+        } 
 
-        const networkId = await provider.request({ method: "net_version" });
-        console.log("networkId:--", networkId);
-        setCurrentNetworkId(networkId);
+        console.log("provider", provider);
+        ethereum = provider;
+        /**********************************************************/
+        /* Handle chain (network) and chainChanged (per EIP-1193) */
+        /**********************************************************/
+        const chainId = parseInt(await ethereum.request({ method: "eth_chainId" }));
+        console.log('chianId:', parseInt(chainId));
+        // handleChainChanged(chainId);
+        ethereum.on("chainChanged", handleChainChanged);
+        if (chainId !== 42 && chainId !==1337) {
+          setMessage("Please connect to Kovan Network...");
+          return false;
+        }
+        setCurrentNetworkId(chainId);
+        setCurrentChainId(chainId);
+        
+        // ethereum.on('chainChanged', (_chainId) => window.location.reload());
+        /***********************************************************/
+        /* Handle user accounts and accountsChanged (per EIP-1193) */
+        /***********************************************************/
+        ethereum
+          .request({ method: "eth_accounts" })
+          .then(handleAccountsChanged)
+          .catch((err) => {
+            // Some unexpected error.
+            // For backwards compatibility reasons, if no accounts are available,
+            // eth_accounts will return an empty array.
+            console.error(err);
+            setMessage(err);
+          });
+
+        // // Note that this event is emitted on page load.
+        // // If the array of accounts is non-empty, you're already
+        // // connected.
+        ethereum.on("accountsChanged", handleAccountsChanged);
+
+        // const networkId = await provider.request({ method: "net_version" });
+        // console.log("networkId:--", networkId);
+        // setCurrentNetworkId(networkId);
 
         let web3 = new Web3(provider);
         setWeb3(web3);
+        setMessage("");
       } else {
         console.log("***************please install metamask");
+        setMessage("Couldn't find ethereum connector. Please install metamask");
       }
     };
     init();
     return () => {
       console.log("useEffect cleanup");
+      ethereum.removeAllListeners();
     };
   }, [currentAccount, currentNetworkId]);
 
@@ -124,37 +133,36 @@ function App() {
         </div>
         <div>Welcome to Sai Marketplace</div>
       </header>
-      {message ? (
-        <div className="app_body">
-          <div>
-            <h3>{message}</h3>
-          </div>
-        </div>
-      ) : (
-        <div className="app_body">
-          <div className={headerClass} >
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setCurrentPage("ethWallet");
-              }}
-              active
-            >
-              Ether Wallet
-            </Button>{" "}
-            <div className='saiLogoDiv' >
-            </div>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setCurrentPage("ethExchange");
-              }}
-              active
-            >
-              Ether Exchange
-            </Button>{" "}
-          </div>
 
+      <div className="app_body">
+        <div className={headerClass}>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setCurrentPage("ethWallet");
+            }}
+            active
+          >
+            Ether Wallet
+          </Button>{" "}
+          <div className="saiLogoDiv"></div>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setCurrentPage("ethExchange");
+            }}
+            active
+          >
+            Ether Exchange
+          </Button>{" "}
+        </div>
+        {message ? (
+          <div className="moduleContainer">
+            <div className="message">
+              <h5>{message}</h5>
+            </div>
+          </div>
+        ) : (
           <div className="moduleContainer">
             {currentPage === "ethWallet" ? (
               <EthWallet
@@ -166,10 +174,11 @@ function App() {
               <EthExchange />
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
       <footer className="footer">
-        @ copyright - to contact developer email at satyas2099@gmail.com
+      &#169; copyright @ CodeBlocks Co. - to contact developer email at satyas2099@gmail.com
       </footer>
     </div>
   );

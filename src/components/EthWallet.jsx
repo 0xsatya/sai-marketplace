@@ -35,7 +35,7 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
   useEffect(() => {
     const init = async () => {
       try {
-        if (web3 !== undefined
+        if (web3 !== undefined && currentAccount !== "0x0" && currentNetworkId !== undefined
           // web3 !== undefined &&
           // currentNetworkId !== undefined &&
           // currentAccount !== "0x0"
@@ -67,7 +67,7 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
             {
               fromBlock: 0,
               toBlock: "latest",
-            },function(error, events){ console.log('Transactions--', events); })
+            },function(error, events){  })
             .then(function(events){
                 console.log('Transactions', events) // same results as the optional callback above
                 setTransactions(events);
@@ -75,7 +75,7 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
 
           // console.log(transactions);
           
-        } else console.log("EthWallet else......");
+        } 
       } catch (err) {
         console.log("Error:", err);
       }
