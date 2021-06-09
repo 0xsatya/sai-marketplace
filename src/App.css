@@ -93,6 +93,19 @@ div.menuItemLogo {
   background-repeat: no-repeat; /* Do not repeat the image */
   background-size: cover; /* Resize the background image to cover the entire container */
 }
+.saiLogoSmallDiv {
+  display: inline;
+  width: 20px;
+  height: 20px;
+  /* margin: 5px 10px; */
+  border-radius: 10px;
+  /* border: 1px solid black; */
+  margin-right: 10px;
+  /* background-repeat: no-repeat, repeat; */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire container */
+}
 
 .footer {
   background-color: #282c34;
@@ -209,7 +222,17 @@ div.menuItemLogo {
 .moduleCardData > * {
   margin: 5px 0;
 }
-
+.childJustifyBetweeninRow{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.smallFont {
+  font-size: .8rem;
+}
+.red{
+  color: red;
+}
 .btn1 {
   background-color: var(--bs-primary);
   border: none;

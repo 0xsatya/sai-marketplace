@@ -10,7 +10,7 @@ import detectEthereumProvider from "@metamask/detect-provider";
 // import SaiToken from "./contracts_abis/SaiToken.json";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("ethWallet");
+  const [currentPage, setCurrentPage] = useState("ethExchange"); //ethExchange || ethWallet
   let [message, setMessage] = useState("Loading...");
 
   // const [accounts, setAccounts] = useState(undefined);
