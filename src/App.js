@@ -1,5 +1,7 @@
 // import logo from "ethlogo.png";
 import "./App.css";
+import Identicon from 'react-identicons';
+
 import Button from "react-bootstrap/Button";
 import EthWallet from "./components/EthWallet";
 import EthExchange from "./components/EthExchange";
@@ -133,6 +135,8 @@ function App() {
           <img className="rotate" src="ethicon.svg" alt="ethicon" />
         </div>
         <div>Welcome to Sai Marketplace</div>
+        
+        <div className='red mediumFont'>{currentAccount? currentAccount.substring(0,5) +'....'+currentAccount.substring(currentAccount.length-5,currentAccount.length): 'Login'} &nbsp;&nbsp;</div><div><Identicon string={currentAccount} size='50' count='5' fg='red'/></div>
       </header>
 
       <div className="app_body">
