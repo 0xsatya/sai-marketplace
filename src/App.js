@@ -10,7 +10,7 @@ import detectEthereumProvider from "@metamask/detect-provider";
 // import SaiToken from "./contracts_abis/SaiToken.json";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("ethExchange"); //ethExchange || ethWallet
+  const [currentPage, setCurrentPage] = useState("ethWallet"); //ethExchange || ethWallet
   let [message, setMessage] = useState("Loading...");
 
   // const [accounts, setAccounts] = useState(undefined);
@@ -51,11 +51,11 @@ function App() {
 
   const listenScrollEvent = (e) => {
     // console.log(window.scrollY);
-    if (window.scrollY > 80) {
-      setHeaderClass("moduleSelector1");
-    } else {
-      setHeaderClass("moduleSelector");
-    }
+    // if (window.scrollY > 150) {
+    //   setHeaderClass("moduleSelector1");
+    // } else {
+    //   setHeaderClass("moduleSelector");
+    // }
   };
 
   useEffect(() => {
@@ -111,6 +111,7 @@ function App() {
         // setCurrentNetworkId(networkId);
 
         let web3 = new Web3(provider);
+        // setCurrentNetworkId(await web3.eth.net.getId());
         setWeb3(web3);
         setMessage("");
       } else {
@@ -137,7 +138,7 @@ function App() {
       <div className="app_body">
         <div className={headerClass}>
           <Button
-            variant="secondary"
+            variant="secondary btn-sm"
             onClick={() => {
               setCurrentPage("ethWallet");
             }}
@@ -147,7 +148,7 @@ function App() {
           </Button>{" "}
           <div className="saiLogoDiv"></div>
           <Button
-            variant="secondary"
+            variant="secondary btn-sm"
             onClick={() => {
               setCurrentPage("ethExchange");
             }}
@@ -171,14 +172,18 @@ function App() {
                 currentNetworkId={currentNetworkId}
               />
             ) : (
-              <EthExchange />
+              <EthExchange 
+                web3={web3}
+                currentAccount={currentAccount}
+                currentNetworkId={currentNetworkId}
+              />
             )}
           </div>
         )}
       </div>
 
       <footer className="footer">
-      &#169; copyright @ CodeBlocks Co. - to contact developer email at satyas2099@gmail.com
+      &#169; copyright 2021 (CodeBlocks) - to contact developer email at satyas2099@gmail.com
       </footer>
     </div>
   );

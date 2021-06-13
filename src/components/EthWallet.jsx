@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, FormControl, InputGroup } from "react-bootstrap";
 import SaiToken from "../contracts_abis/SaiToken.json";
+import Identicon from 'react-identicons';
 
 function EthWallet({ web3, currentNetworkId, currentAccount }) {
   let [balance, setBalance] = useState("0000");
@@ -10,7 +11,7 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
   let [recipient, setRecipient] = useState("0x0");
   let [transactions, setTransactions] = useState([]);
   const [saiToken, setSaiToken] = useState(undefined);
-
+const [ethBalance, setEthBalance] = useState('0');
   let saiTokenAddress = "";
   // let saiToken = null;
 
@@ -18,9 +19,9 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
     let amount = web3.utils.toWei(transferAmount, "Ether");
     console.log(recipient, amount);
     console.log(saiToken, saiTokenAddress);
-    if(!web3.utils.isAddress(recipient)){
-      console.log('not a correct address..');
-      alert('Please enter proper recipient address');
+    if (!web3.utils.isAddress(recipient)) {
+      console.log("not a correct address..");
+      alert("Please enter proper recipient address");
       return false;
     }
     saiToken.methods
@@ -35,12 +36,15 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
   useEffect(() => {
     const init = async () => {
       try {
-        if (web3 !== undefined && currentAccount !== "0x0" && currentNetworkId !== undefined
+        if (
+          web3 !== undefined &&
+          currentAccount !== "0x0" &&
+          currentNetworkId !== undefined
           // web3 !== undefined &&
           // currentNetworkId !== undefined &&
           // currentAccount !== "0x0"
         ) {
-          console.log('inside useeffect EthWallet...');
+          console.log("inside useeffect EthWallet...");
           console.log(web3, currentNetworkId);
           console.log("accountAddress:", currentAccount);
           // console.log("web3:", web3);
@@ -48,7 +52,8 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
           // console.log("web3 accounts:", await web3.eth.getAccounts());
           setProvider(web3.givenProvider);
           // console.log("currentNetworkId:", currentNetworkId);
-          saiTokenAddress = SaiToken.networks[currentNetworkId].address;
+          let netId = await web3.eth.net.getId();
+          saiTokenAddress = SaiToken.networks[netId].address;
           let saiTokenMock = new web3.eth.Contract(
             SaiToken.abi,
             saiTokenAddress
@@ -62,20 +67,27 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
             .call();
           console.log("balance:", bal, typeof bal);
           setBalance(web3.utils.fromWei(bal, "Ether"));
-          saiTokenMock.getPastEvents(
-            "Transfer",
-            {
-              fromBlock: 0,
-              toBlock: "latest",
-            },function(error, events){  })
-            .then(function(events){
-                console.log('Transactions', events) // same results as the optional callback above
-                setTransactions(events);
+          let ethBalance = web3.utils.fromWei(
+            await web3.eth.getBalance(currentAccount)
+          );
+          setEthBalance(ethBalance);
+
+          saiTokenMock
+            .getPastEvents(
+              "Transfer",
+              {
+                fromBlock: 0,
+                toBlock: "latest",
+              },
+              function (error, events) {}
+            )
+            .then(function (events) {
+              console.log("Transactions", events); // same results as the optional callback above
+              setTransactions(events);
             });
 
           // console.log(transactions);
-          
-        } 
+        }
       } catch (err) {
         console.log("Error:", err);
       }
@@ -85,7 +97,7 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
     return () => {
       // console.log("EthWallet useeffect cleanup");
     };
-  },[currentNetworkId, currentAccount, balance]);
+  }, [currentNetworkId, currentAccount, balance]);
 
   return (
     <div className="moduleCard">
@@ -94,18 +106,34 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
       </div>
       <div className="moduleCardData">
         <Card className="text-center" border="info">
-        <Card.Header><h5>SAI TOKEN</h5></Card.Header>
-          <Card.Body >
+          <Card.Header>
+            <h5>SAI TOKEN</h5>
+          </Card.Header>
+          <Card.Body>
             {/* <Card.Title>SAI Token </Card.Title> */}
             <Card.Subtitle className="mb-2 text-muted">
-              Balance : {balance} $<span>SAI</span>
+              Balance : <span className='red'>{balance} $ SAI</span> <span className='red'>( {ethBalance} ETH)</span>
             </Card.Subtitle>
-            <Card.Link href="#">Account: {currentAccount}</Card.Link>
+            <Card.Subtitle>Account</Card.Subtitle>
+            { currentAccount? 
+              <Card.Text>
+              {/* <img className="ml-2"
+              width='30' height='30' 
+              src={`data:image/png;base64, ${new Identicon(currentAccount, 30).toString()}`}
+              alt='identicon'
+              /> */}
+              <Identicon string={currentAccount} size='50' count='5'/>
+            </Card.Text>
+            :
+            ''}
+            <Card.Link href="#">{currentAccount}</Card.Link>
             <Card.Text></Card.Text>
           </Card.Body>
         </Card>
         <Card className="text-center" border="info">
-        <Card.Header><h5>Transfer Funds</h5></Card.Header>
+          <Card.Header>
+            <h5>Transfer SAI Tokens</h5>
+          </Card.Header>
           <Card.Body>
             {/* <Card.Title>Transfer Funds</Card.Title> */}
 
@@ -133,7 +161,12 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
               <InputGroup.Text id="basic-addon2">SAI</InputGroup.Text>
             </InputGroup>
             <InputGroup className="mb-3">
-              <Button variant="primary" style={{width: '100%'}} size="sm" onClick={TransferFundHandler}>
+              <Button
+                variant="primary"
+                style={{ width: "100%" }}
+                size="sm"
+                onClick={TransferFundHandler}
+              >
                 Transfer Funds
               </Button>
             </InputGroup>
@@ -141,23 +174,33 @@ function EthWallet({ web3, currentNetworkId, currentAccount }) {
           </Card.Body>
         </Card>
         <Card className="text-center" border="info">
-        <Card.Header><h5>Transactions</h5></Card.Header>
+          <Card.Header>
+            <h5>Transactions</h5>
+          </Card.Header>
           <Card.Body>
             {/* <Card.Title>Transactions</Card.Title> */}
             <div className="table-responsive">
-            <table className="table table-sm table-striped" >
-              <thead><tr><th scope="col">Event</th><th scope="col">Recipient</th><th scope="col">Value</th></tr></thead>
-              <tbody>
-              { transactions.map((t, index) => (
-                <tr key={index}>
-                  <td>{t.event}</td><td>{t.returnValues[1]}</td><td>{web3.utils.fromWei(t.returnValues[2])}</td>
-                </tr>
-            ))}
-              </tbody>
-            </table>
+              <table className="table table-sm table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">Event</th>
+                    <th scope="col">Recipient</th>
+                    <th scope="col">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions.map((t, index) => (
+                    <tr key={index}>
+                      <td>{t.event}</td>
+                      <td>{t.returnValues[1]}</td>
+                      <td>{web3.utils.fromWei(t.returnValues[2])}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </Card.Body>
-          </Card>
+        </Card>
       </div>
     </div>
   );

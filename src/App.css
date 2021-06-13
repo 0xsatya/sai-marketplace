@@ -17,6 +17,28 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+/* width */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  box-shadow: inset 0 0 2px grey;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 
 .App-header {
   /* top: 0;
@@ -82,10 +104,10 @@ div.menuItemLogo {
 }
 
 .saiLogoDiv {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   /* margin: 5px 10px; */
-  border-radius: 25px;
+  border-radius: 20px;
   /* border: 1px solid black; */
   background-image: url("sailogo.png");
   /* background-repeat: no-repeat, repeat; */
@@ -138,7 +160,7 @@ div.menuItemLogo {
 }
 .moduleSelector1 {
   position: fixed;
-  top: 2px;
+  top: 1px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -148,7 +170,7 @@ div.menuItemLogo {
   background-color: #282c34;
   box-shadow: 0px 4px 5px 0px grey;
   z-index: 100;
-  height: 70px;
+  height: 60px;
   margin: 5px 0;
   border-radius: 2px;
   /* visibility: visible; */
@@ -158,7 +180,7 @@ div.menuItemLogo {
 }
 @-webkit-keyframes expand{
   0%{height:0px}
-  100%{height:70px}
+  100%{height:60px}
 }
 
 .moduleSelector > button {
@@ -175,7 +197,7 @@ div.menuItemLogo {
   /* min-width: 400px; */
   /* flex: 1; */
   /* min-width: 500px; */
-  /* max-width: 50%; */
+  max-width: 70%;
   /* min-height: 40vh; */
   /* border: 3px solid red; */
   margin: 5px 0;
@@ -184,8 +206,11 @@ div.menuItemLogo {
 .message {
   color: red;
   width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
   justify-content: center;
   align-items: center;
+  margin-top: 10px;
 }
 .moduleCard {
   display: flex;
