@@ -38,7 +38,7 @@ const [ethBalance, setEthBalance] = useState('0');
       try {
         if (
           web3 !== undefined &&
-          currentAccount !== "0x0" &&
+          currentAccount !== undefined &&
           currentNetworkId !== undefined
           // web3 !== undefined &&
           // currentNetworkId !== undefined &&
@@ -112,7 +112,7 @@ const [ethBalance, setEthBalance] = useState('0');
           <Card.Body>
             {/* <Card.Title>SAI Token </Card.Title> */}
             <Card.Subtitle className="mb-2 text-muted">
-              Balance : <span className='red'>{balance} $ SAI</span> <span className='red'>( {ethBalance} ETH)</span>
+              Balance : <span className='red'>{balance} SAI</span> <span className='red'>( {ethBalance} ETH)</span>
             </Card.Subtitle>
             <Card.Subtitle>Account</Card.Subtitle>
             { currentAccount? 

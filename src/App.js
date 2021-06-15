@@ -1,6 +1,6 @@
 // import logo from "ethlogo.png";
 import "./App.css";
-import Identicon from 'react-identicons';
+import Identicon from "react-identicons";
 
 import Button from "react-bootstrap/Button";
 import EthWallet from "./components/EthWallet";
@@ -16,23 +16,25 @@ function App() {
   let [message, setMessage] = useState("Loading...");
 
   // const [accounts, setAccounts] = useState(undefined);
-  const [currentAccount, setCurrentAccount] = useState("0x0");
+  const [currentAccount, setCurrentAccount] = useState(undefined);
   const [currentNetworkId, setCurrentNetworkId] = useState(undefined);
   const [currentChainId, setCurrentChainId] = useState(undefined);
 
   // const [balance, setBalance] = useState(undefined);
   // const [transaction, setTransaction] = useState([]);
-  // const [provider, setProvider] = useState(undefined); //web3provider
+  let [ethereum, setEthereum] = useState(undefined); //web3provider
   const [web3, setWeb3] = useState(undefined);
-  let ethereum = null;
+  // let ethereum = null;
   const [color, setColor] = useState("#fafafd");
   const [headerClass, setHeaderClass] = useState("moduleSelector");
+  const [connected, setConnected] = useState(false);
 
   function handleAccountsChanged(accounts) {
     console.log("handleAccountsChanged called..", accounts);
     if (accounts.length === 0) {
       // MetaMask is locked or the user has not connected any accounts
       console.log("Please connect to MetaMask.");
+      setCurrentAccount('');
       setMessage(
         "Please connect to Metamask Kovan network and refresh page..."
       );
@@ -49,6 +51,23 @@ function App() {
     window.location.reload();
   }
 
+  const onLoginHandler = () => {
+    ethereum
+      .request({ method: "eth_requestAccounts" })
+      .then(handleAccountsChanged)
+      .catch((err) => {
+        if (err.code === 4001) {
+          // EIP-1193 userRejectedRequest error
+          // If this happens, the user rejected the connection request.
+          console.log("Please manually connect this app to MetaMask.");
+          setMessage("Please manually connect this app to MetaMask.");
+        } else {
+          console.error(err);
+          setMessage("Erro in login:" + err.message);
+        }
+      });
+  };
+
   // const startApp = useCallback(async (provider) => {});
 
   const listenScrollEvent = (e) => {
@@ -62,36 +81,47 @@ function App() {
 
   useEffect(() => {
     window.addEventListener("scroll", listenScrollEvent);
+    console.log('app.js useeffect called..');
     const init = async () => {
       const provider = await detectEthereumProvider();
       if (provider) {
+        console.log("app.js useeffect init called...");
         // If the provider returned by detectEthereumProvider is not the same as
         // window.ethereum, something is overwriting it, perhaps another wallet.
         if (provider !== window.ethereum) {
           console.error("Do you have multiple wallets installed?");
           setMessage("Do you have multiple wallets installed?");
-        } 
+        }
 
         console.log("provider", provider);
         ethereum = provider;
+        setEthereum(provider);
         /**********************************************************/
         /* Handle chain (network) and chainChanged (per EIP-1193) */
         /**********************************************************/
-        const chainId = parseInt(await ethereum.request({ method: "eth_chainId" }));
-        console.log('chianId:', parseInt(chainId));
+        const chainId = parseInt(
+          await ethereum.request({ method: "eth_chainId" })
+        );
+        console.log("chianId:", parseInt(chainId));
         // handleChainChanged(chainId);
         ethereum.on("chainChanged", handleChainChanged);
-        if (chainId !== 42 && chainId !==1337) {
+        if (chainId !== 42 && chainId !== 1337) {
           setMessage("Please connect to Kovan Network...");
           return false;
         }
-        setCurrentNetworkId(chainId);
+        console.log('networkid:--------------', ethereum.networkVersion);
+        setCurrentNetworkId(ethereum.networkVersion);
         setCurrentChainId(chainId);
-        
+
         // ethereum.on('chainChanged', (_chainId) => window.location.reload());
         /***********************************************************/
         /* Handle user accounts and accountsChanged (per EIP-1193) */
         /***********************************************************/
+         // // Note that this event is emitted on page load.
+        // // If the array of accounts is non-empty, you're already
+        // // connected.
+        ethereum.on("accountsChanged", handleAccountsChanged);
+
         ethereum
           .request({ method: "eth_accounts" })
           .then(handleAccountsChanged)
@@ -103,11 +133,9 @@ function App() {
             setMessage(err);
           });
 
-        // // Note that this event is emitted on page load.
-        // // If the array of accounts is non-empty, you're already
-        // // connected.
-        ethereum.on("accountsChanged", handleAccountsChanged);
-
+       
+        // ethereum.on("connect", (connectInfo) => {console.log('connected..chainId:', connectInfo);})
+        // ethereum.on("disconnect", (error) => {console.log('disconnected...chainId:', error);})
         // const networkId = await provider.request({ method: "net_version" });
         // console.log("networkId:--", networkId);
         // setCurrentNetworkId(networkId);
@@ -123,8 +151,10 @@ function App() {
     };
     init();
     return () => {
-      console.log("useEffect cleanup");
-      ethereum.removeAllListeners();
+      if (ethereum) {
+        console.log("useEffect cleanup");
+        ethereum.removeAllListeners();
+      }
     };
   }, [currentAccount, currentNetworkId]);
 
@@ -135,8 +165,30 @@ function App() {
           <img className="rotate" src="ethicon.svg" alt="ethicon" />
         </div>
         <div>Welcome to Sai Marketplace</div>
-        
-        <div className='red mediumFont'>{currentAccount? currentAccount.substring(0,5) +'....'+currentAccount.substring(currentAccount.length-5,currentAccount.length): 'Login'} &nbsp;&nbsp;</div><div><Identicon string={currentAccount} size='50' count='5' fg='red'/></div>
+
+        <div className="mediumFont">
+          {currentAccount ? (
+            <div>
+              <div className="smallFont red">
+                {currentAccount.substring(0, 5) +
+                  "...." +
+                  currentAccount.substring(
+                    currentAccount.length - 5,
+                    currentAccount.length
+                  )}{" "}
+                &nbsp;&nbsp;
+              </div>
+              {/* <div><Identicon string={currentAccount} size='30' count='5' fg='red'/></div> */}
+            </div>
+          ) : (
+            <div className="smallFont">
+              <a onClick={onLoginHandler} href="#">
+                Login
+              </a>
+              &nbsp;&nbsp;
+            </div>
+          )}
+        </div>
       </header>
 
       <div className="app_body">
@@ -176,7 +228,7 @@ function App() {
                 currentNetworkId={currentNetworkId}
               />
             ) : (
-              <EthExchange 
+              <EthExchange
                 web3={web3}
                 currentAccount={currentAccount}
                 currentNetworkId={currentNetworkId}
@@ -187,7 +239,8 @@ function App() {
       </div>
 
       <footer className="footer">
-      &#169; copyright 2021 (CodeBlocks) - to contact developer email at satyas2099@gmail.com
+        &#169; Copyright 2021 (CodeBlocks) - to contact developer email at
+        satyas2099@gmail.com
       </footer>
     </div>
   );
