@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 // import './DaiToken/ERC20Mintable.sol';
 
 contract SaiToken is ERC20 {
-    string public tokenName = "Sai Stablecoin (SAI)";
+    string public tokenName = "Sai Stablecoin";
     string public tokenSymbol = "SAI";
     uint8 public tokenDecimals = 18;
     // uint256 public INITIAL_SUPPLY = 12000;

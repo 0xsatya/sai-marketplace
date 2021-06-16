@@ -4,7 +4,12 @@ import { Card, FormControl, InputGroup } from "react-bootstrap";
 import EthSwap from "../contracts_abis/EthSwap.json";
 import SaiToken from "../contracts_abis/SaiToken.json";
 
-function EthExchange({ web3, currentAccount, currentNetworkId }) {
+function EthExchange({
+  web3,
+  currentAccount,
+  currentNetworkId,
+  addressScanUrl,
+}) {
   const [currentModule, setCurrentModule] = useState("Buy"); //Buy or Sell
   let [inputValue, setInputValue] = useState("");
   let [outputValue, setOutputValue] = useState("");
@@ -42,7 +47,14 @@ function EthExchange({ web3, currentAccount, currentNetworkId }) {
   function tokens(n) {
     return web3.utils.toWei(n, "ether");
   }
-
+  function updateBtn(btne, status) {
+    console.log("btne:", btne);
+    btne.target.innerHTML = "SWAPP " + status;
+    setTimeout(() => {
+      btne.target.innerHTML = "SWAPP";
+      btne.target.disabled = false;
+    }, 1000);
+  }
   const inputChangedHandler = (e) => {
     let input = Number(e.target.value);
     setInputValue(e.target.value);
@@ -51,9 +63,14 @@ function EthExchange({ web3, currentAccount, currentNetworkId }) {
     console.log("inputchanged handler", input, output);
   };
 
-  const swapTokensHandler = async () => {
-    if(inputValue.trim() === ''){
-      inputValue = '1';
+  const swapTokensHandler = async (e) => {
+    console.log(e);
+    let btne = e;
+    e.target.innerHTML = "SWAPPING...";
+    e.target.disabled = true;
+
+    if (inputValue.trim() === "") {
+      inputValue = "1";
     }
     // inputValue = "1";
     // let inputValue1 = '100';
@@ -65,32 +82,48 @@ function EthExchange({ web3, currentAccount, currentNetworkId }) {
           from: currentAccount,
           value: web3.utils.toWei(inputValue, "ether"),
         })
-        .on('receipt', (receipt) => {
+        .on("receipt", (receipt) => {
+          updateBtn(btne, "COMPLETED");
           console.log(receipt);
           setSaiBal("");
-        }).on('error', (error) => {
-          console.log('Error in sellToken:', error);
+        })
+        .on("error", (error) => {
+          updateBtn(btne, "FAILED");
+          console.log("Error in sellToken:", error);
           setMessage(error.message);
-      });
-      
+        });
     } else if (currentModule === sell) {
-      let allowance = await saiToken.methods.allowance(currentAccount, ethSwap.options.address).call({from: currentAccount});
-      console.log('allowance:', web3.utils.fromWei(allowance));
-      setMessage('Allowance: '+ web3.utils.fromWei(allowance)+' SAI');
-      if(allowance < inputValue){
-        await saiToken.methods.approve(ethSwap.options.address, tokens(String(inputValue*5))).send({from: currentAccount});
+      let allowance = await saiToken.methods
+        .allowance(currentAccount, ethSwap.options.address)
+        .call({ from: currentAccount });
+      console.log("allowance:", web3.utils.fromWei(allowance));
+      setMessage("Allowance: " + web3.utils.fromWei(allowance) + " SAI");
+
+      if (Number(web3.utils.fromWei(allowance)) < Number(inputValue)) {
+        await saiToken.methods
+          .approve(ethSwap.options.address, tokens(String(inputValue * 2)))
+          .send({ from: currentAccount });
       }
-      
-      ethSwap.methods.sellTokens(tokens(inputValue)).send({
-        from: currentAccount,
-      })
-      .then((receipt) => {
-        console.log('sell Token receipt:', receipt);
-        setSaiBal("");
-      }).catch( error => {
-          console.log('Error in sellToken:', error.message);
+
+      ethSwap.methods
+        .sellTokens(tokens(inputValue))
+        .send({
+          from: currentAccount,
+        })
+        .then(async (receipt) => {
+          updateBtn(btne, "COMPLETED");
+          console.log("sell Token receipt:", receipt);
+          setSaiBal("");
+          let allowance = await saiToken.methods
+            .allowance(currentAccount, ethSwap.options.address)
+            .call({ from: currentAccount });
+          setMessage("Allowance remaining:" + web3.utils.fromWei(allowance));
+        })
+        .catch((error) => {
+          updateBtn(btne, "FAILED");
+          console.log("Error in sellToken:", error.message);
           setMessage(error.message);
-      });
+        });
     }
   };
 
@@ -150,10 +183,15 @@ function EthExchange({ web3, currentAccount, currentNetworkId }) {
         <div className="childJustifyBetweeninRow">
           <button
             type="button"
-            className="btn btn-outline-primary btn-sm"
+            className={
+              currentModule === "Buy"
+                ? "btn btn-primary btn-sm"
+                : "btn btn-outline-primary btn-sm"
+            }
             onClick={() => {
               //buy token
               setCurrentModule("Buy");
+              setMessage('');
             }}
           >
             Buy
@@ -164,9 +202,15 @@ function EthExchange({ web3, currentAccount, currentNetworkId }) {
           </div>
           <button
             type="button"
-            className="btn btn-outline-primary btn-sm"
+            className={
+              currentModule === "Sell"
+                ? "btn btn-primary btn-sm"
+                : "btn btn-outline-primary btn-sm"
+            }
             onClick={() => {
               setCurrentModule("Sell");
+              setMessage('');
+
             }}
           >
             {" "}

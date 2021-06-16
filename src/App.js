@@ -10,6 +10,8 @@ import Web3 from "web3";
 import EthTest from "./components/EthTest";
 import detectEthereumProvider from "@metamask/detect-provider";
 // import SaiToken from "./contracts_abis/SaiToken.json";
+import * as Utility from './utilities/utils';
+
 
 function App() {
   const [currentPage, setCurrentPage] = useState("ethWallet"); //ethExchange || ethWallet
@@ -28,6 +30,7 @@ function App() {
   const [color, setColor] = useState("#fafafd");
   const [headerClass, setHeaderClass] = useState("moduleSelector");
   const [connected, setConnected] = useState(false);
+  let [addressScanUrl, setAddressScanUrl] = useState(undefined);
 
   function handleAccountsChanged(accounts) {
     console.log("handleAccountsChanged called..", accounts);
@@ -105,12 +108,16 @@ function App() {
         console.log("chianId:", parseInt(chainId));
         // handleChainChanged(chainId);
         ethereum.on("chainChanged", handleChainChanged);
-        if (chainId !== 42 && chainId !== 1337) {
-          setMessage("Please connect to Kovan Network...");
+        if (chainId !== 42 && chainId !== 1337 && chainId !== 3 && chainId !== 4) {
+          setMessage("Please connect to Kovan, Ropsten or Rinkeby Network...");
           return false;
         }
         console.log('networkid:--------------', ethereum.networkVersion);
         setCurrentNetworkId(ethereum.networkVersion);
+        let addScanUrl = await Utility.getAddressScanUrl(ethereum.networkVersion);
+        console.log('---------------addScanurl:',addScanUrl);
+
+        setAddressScanUrl(addScanUrl);
         setCurrentChainId(chainId);
 
         // ethereum.on('chainChanged', (_chainId) => window.location.reload());
@@ -169,13 +176,9 @@ function App() {
         <div className="mediumFont">
           {currentAccount ? (
             <div>
-              <div className="smallFont red">
-                {currentAccount.substring(0, 5) +
-                  "...." +
-                  currentAccount.substring(
-                    currentAccount.length - 5,
-                    currentAccount.length
-                  )}{" "}
+              <div >
+              <a href={addressScanUrl+currentAccount} target='_blank' className="smallFont red">{Utility.getShortAddress(currentAccount)}</a>
+               
                 &nbsp;&nbsp;
               </div>
               {/* <div><Identicon string={currentAccount} size='30' count='5' fg='red'/></div> */}
@@ -226,12 +229,14 @@ function App() {
                 web3={web3}
                 currentAccount={currentAccount}
                 currentNetworkId={currentNetworkId}
+                addressScanUrl={addressScanUrl}
               />
             ) : (
               <EthExchange
                 web3={web3}
                 currentAccount={currentAccount}
                 currentNetworkId={currentNetworkId}
+                addressScanUrl={addressScanUrl}
               />
             )}
           </div>
