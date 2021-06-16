@@ -32,7 +32,7 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
     console.log(saiToken, saiTokenAddress);
     if (!web3.utils.isAddress(recipient)) {
       console.log("not a correct address..");
-      alert("Please enter proper recipient address");
+      setMessage("Please enter proper recipient address");
       return false;
     }
     if(currentAccount.toUpperCase() === recipient.toUpperCase()){
