@@ -41,7 +41,7 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
     }
     let bal = await saiToken.methods.balanceOf(currentAccount).call({from: currentAccount});
     bal = web3.utils.fromWei(bal, 'Ether');
-    if(bal < amount){
+    if(bal < transferAmount){
       setMessage('You do not have sufficient funds to transfer, Please buy some tokens from Exchange');
       return false;
     }
@@ -232,10 +232,10 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
           <Card.Body>
             {/* <Card.Title>Transactions</Card.Title> */}
             <div className="table-responsive">
-              <table className="table table-sm table-striped">
+              <table className="table table-sm table-striped table-hover">
                 <thead>
                   <tr>
-                    <th scope="col">Event</th>
+                    <th scope="col" >Event</th>
                     <th scope="col">Sender</th>
                     <th scope="col">Recipient</th>
                     <th scope="col">Value</th>
@@ -245,9 +245,9 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
                   {transactions.map((t, index) => (
                     <tr key={index}>
                       <td>{t.event}</td>
-                      <td><a href={addressScanUrl+t.returnValues[0]} target='_blank' rel='noreferrer'>{t.returnValues[0].toUpperCase() === currentAccount.toUpperCase() ? 'MyAccount' : Utility.getShortAddress(t.returnValues[0])}</a></td>
-                      <td><a href={addressScanUrl+t.returnValues[1]} target='_blank' rel='noreferrer'>{t.returnValues[1].toUpperCase() === currentAccount.toUpperCase() ? 'MyAccount' : Utility.getShortAddress(t.returnValues[1])}</a></td>
-                      <td>{web3.utils.fromWei(t.returnValues[2])}</td>
+                      <td align="left"><a href={addressScanUrl+t.returnValues[0]} target='_blank' rel='noreferrer'>{t.returnValues[0].toUpperCase() === currentAccount.toUpperCase() ? 'My Account' : Utility.getShortAddress(t.returnValues[0])}</a></td>
+                      <td align="left"><a href={addressScanUrl+t.returnValues[1]} target='_blank' rel='noreferrer'>{t.returnValues[1].toUpperCase() === currentAccount.toUpperCase() ? 'My Account' : Utility.getShortAddress(t.returnValues[1])}</a></td>
+                      <td align="right">{web3.utils.fromWei(t.returnValues[2])}</td>
                     </tr>
                   ))}
                 </tbody>
