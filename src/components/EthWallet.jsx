@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Card, FormControl, InputGroup } from "react-bootstrap";
 import SaiToken from "../contracts_abis/SaiToken.json";
 import Identicon from "react-identicons";
-import * as Utility from '../utilities/utils';
+import * as Utility from "../utilities/utils";
 
 function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
   let [balance, setBalance] = useState("0000");
@@ -13,12 +13,12 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
   let [transactions, setTransactions] = useState([]);
   const [saiToken, setSaiToken] = useState(undefined);
   const [ethBalance, setEthBalance] = useState("0");
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   let saiTokenAddress = "";
   // let saiToken = null;
   function updateBtn(btne, status) {
     console.log("btne:", btne);
-    btne.target.innerHTML = "Transfer "+status;
+    btne.target.innerHTML = "Transfer " + status;
     setTimeout(() => {
       btne.target.innerHTML = "Transfer Funds";
       btne.target.disabled = false;
@@ -26,7 +26,6 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
   }
 
   const TransferFundHandler = async (e) => {
-
     let amount = web3.utils.toWei(transferAmount, "Ether");
     console.log(recipient, amount);
     console.log(saiToken, saiTokenAddress);
@@ -35,18 +34,22 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
       setMessage("Please enter proper recipient address");
       return false;
     }
-    if(currentAccount.toUpperCase() === recipient.toUpperCase()){
-      setMessage('Transfer to self Account is not allowed');
+    if (currentAccount.toUpperCase() === recipient.toUpperCase()) {
+      setMessage("Transfer to self Account is not allowed");
       return false;
     }
-    let bal = await saiToken.methods.balanceOf(currentAccount).call({from: currentAccount});
-    bal = web3.utils.fromWei(bal, 'Ether');
-    if(bal < transferAmount){
-      setMessage('You do not have sufficient funds to transfer, Please buy some tokens from Exchange');
+    let bal = await saiToken.methods
+      .balanceOf(currentAccount)
+      .call({ from: currentAccount });
+    bal = web3.utils.fromWei(bal, "Ether");
+    if (bal < transferAmount) {
+      setMessage(
+        "You do not have sufficient funds to transfer, Please buy some tokens from Exchange"
+      );
       return false;
     }
-    
-    e.target.innerHTML = 'Transferring...';
+
+    e.target.innerHTML = "Transferring...";
     e.target.disabled = true;
 
     saiToken.methods
@@ -56,20 +59,21 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
         updateBtn(e, "Success");
         console.log("TransferFundReceipt:", receipt);
         setBalance(0);
-      }).catch( error => {
+      })
+      .catch((error) => {
         updateBtn(e, "Failed");
-          console.log('Error in transfer funds:', error);
-          setMessage(error.message);
+        console.log("Error in transfer funds:", error);
+        setMessage(error.message);
       });
 
-      // .on("receipt", function (e) {
-      //   console.log("TransferFundReceipt:", e);
-      //   setBalance(0);
-      // })
-      // .on('error', (error) =>{
-      //   console.log('Error occured:', message);
-      //   setMessage(error.message);
-      // });
+    // .on("receipt", function (e) {
+    //   console.log("TransferFundReceipt:", e);
+    //   setBalance(0);
+    // })
+    // .on('error', (error) =>{
+    //   console.log('Error occured:', message);
+    //   setMessage(error.message);
+    // });
   };
 
   useEffect(() => {
@@ -138,8 +142,10 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
     };
   }, [currentNetworkId, currentAccount, balance]);
 
-  function getShortAdd(add){
-    return add.substring(0, 5) +'...'+add.substring(add.length-5, add.length);
+  function getShortAdd(add) {
+    return (
+      add.substring(0, 5) + "..." + add.substring(add.length - 5, add.length)
+    );
   }
   return (
     <div className="moduleCard">
@@ -149,8 +155,12 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
       <div className="moduleCardData">
         <Card className="text-center" border="info">
           <Card.Header>
-            
-          <a href={addressScanUrl+ (saiToken && saiToken.options.address)} target='_blank'><h6>SAI TOKEN</h6></a>
+            <a
+              href={addressScanUrl + (saiToken && saiToken.options.address)}
+              target="_blank"
+            >
+              <h6>SAI TOKEN</h6>
+            </a>
           </Card.Header>
           <Card.Body>
             {/* <Card.Title>SAI Token </Card.Title> */}
@@ -171,8 +181,12 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
             ) : (
               ""
             )}
-            <a href={addressScanUrl+currentAccount} target='_blank'>{currentAccount}</a>
-            <Card.Text></Card.Text>
+
+            <Card.Text>
+              <a href={addressScanUrl + currentAccount} target="_blank">
+                {Utility.getShortAddress(currentAccount)}
+              </a>
+            </Card.Text>
           </Card.Body>
         </Card>
         <Card className="text-center" border="info">
@@ -225,36 +239,36 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
             {/* <button className="btn1" onClick={() => {}}>Transfer Funds</button> */}
           </Card.Body>
         </Card>
-        <Card className="text-center" border="info">
-          <Card.Header>
-            <h5>Transactions</h5>
-          </Card.Header>
-          <Card.Body>
-            {/* <Card.Title>Transactions</Card.Title> */}
-            <div className="table-responsive">
-              <table className="table table-sm table-striped table-hover">
-                <thead>
-                  <tr>
-                    <th scope="col" >Event</th>
-                    <th scope="col">Sender</th>
-                    <th scope="col">Recipient</th>
-                    <th scope="col">Value</th>
+
+        <div className="card">
+          <div className="card-header text-center">
+            <h6> Transactions</h6>
+          </div>
+          <div className="card-body">
+          <div className="table-responsive-sm">
+            <table className="table table-sm table-striped table-hover">
+              <thead>
+                <tr>
+                  <th scope="col" >Event</th>
+                  <th scope="col">Sender</th>
+                  <th scope="col">Recipient</th>
+                  <th scope="col">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((t, index) => (
+                  <tr key={index}>
+                    <td><a href={addressScanUrl.substring(0,addressScanUrl.length-9)+'/tx/'+t.transactionHash} target='_blank' rel='noreferrer'>{t.event}</a></td>
+                    <td align="left"><a href={addressScanUrl+t.returnValues[0]} target='_blank' rel='noreferrer'>{t.returnValues[0].toUpperCase() === currentAccount.toUpperCase() ? 'My Account' : Utility.getShortAddress(t.returnValues[0])}</a></td>
+                    <td align="left"><a href={addressScanUrl+t.returnValues[1]} target='_blank' rel='noreferrer'>{t.returnValues[1].toUpperCase() === currentAccount.toUpperCase() ? 'My Account' : Utility.getShortAddress(t.returnValues[1])}</a></td>
+                    <td align="right">{web3.utils.fromWei(t.returnValues[2])}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((t, index) => (
-                    <tr key={index}>
-                      <td>{t.event}</td>
-                      <td align="left"><a href={addressScanUrl+t.returnValues[0]} target='_blank' rel='noreferrer'>{t.returnValues[0].toUpperCase() === currentAccount.toUpperCase() ? 'My Account' : Utility.getShortAddress(t.returnValues[0])}</a></td>
-                      <td align="left"><a href={addressScanUrl+t.returnValues[1]} target='_blank' rel='noreferrer'>{t.returnValues[1].toUpperCase() === currentAccount.toUpperCase() ? 'My Account' : Utility.getShortAddress(t.returnValues[1])}</a></td>
-                      <td align="right">{web3.utils.fromWei(t.returnValues[2])}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card.Body>
-        </Card>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          </div>
+        </div>
       </div>
     </div>
   );

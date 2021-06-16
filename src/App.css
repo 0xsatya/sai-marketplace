@@ -205,20 +205,6 @@ div.menuItemLogo {
 .moduleSelector1 > button {
   margin: 0 30px;
 }
-.moduleContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-self: center;
-  /* min-width: 400px; */
-  /* flex: 1; */
-  /* min-width: 500px; */
-  max-width: 70%;
-  /* min-height: 40vh; */
-  /* border: 3px solid red; */
-  margin: 5px 0;
-  padding: 5px 20px;
-}
 .message {
   color: red;
   font-weight: bold;
@@ -229,6 +215,22 @@ div.menuItemLogo {
   align-items: center;
   margin-top: 10px;
 }
+
+.moduleContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  /* min-width: 400px; */
+  /* flex: 1; */
+  /* min-width: 500px; */
+  /* max-width: 800px; */
+  /* min-height: 40vh; */
+  /* border: 3px solid red; */
+  margin: 5px 0;
+  padding: 5px 10px;
+}
+
 .moduleCard {
   display: flex;
   flex-direction: column;
@@ -256,9 +258,11 @@ div.menuItemLogo {
 
 .moduleCardData {
   flex: 1;
-  width: 100%;
-  padding: 5px 10px;
+  /* width: 100%; */
+  padding: 5px 5PX;
   /* border: 1px solid black; */
+  max-width: 95vw;
+
 }
 
 .moduleCardData > * {
