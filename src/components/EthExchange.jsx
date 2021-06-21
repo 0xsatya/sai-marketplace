@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Card, FormControl, InputGroup } from "react-bootstrap";
 import EthSwap from "../contracts_abis/EthSwap.json";
 import SaiToken from "../contracts_abis/SaiToken.json";
+import SaiBEP20Token from "../contracts_abis/SaiBEP20Token.json";
+
 
 function EthExchange({
   web3,
@@ -17,9 +19,11 @@ function EthExchange({
   let [ethBal, setEthBal] = useState("00");
   let [message, setMessage] = useState("");
   const [ethSwap, setEthSwap] = useState(undefined);
-  const [saiToken, setSaiToken] = useState(undefined);
+  let [saiToken, setSaiToken] = useState(undefined);
   const buy = "Buy";
   const sell = "Sell";
+
+  const [nativeCurrency, setNativeCurrency] = useState("ETH");
 
   let saiInput = (
     <div className="input-group-append">
@@ -40,7 +44,7 @@ function EthExchange({
           className="saiLogoSmallDiv"
           style={{ backgroundImage: 'url("ethericon.png")' }}
         ></div>
-        ETH
+        {nativeCurrency}
       </span>
     </div>
   );
@@ -155,10 +159,25 @@ function EthExchange({
         console.log("ethBalance:", ethBalance);
         setEthBal(ethBalance);
 
-        var saiToken = new web3.eth.Contract(
-          SaiToken.abi,
-          SaiToken.networks[netId].address
-        );
+        let saiTokenAddress;
+
+        if(currentNetworkId != undefined && (currentNetworkId === "97" || currentNetworkId === "56")) {
+          console.log('Setting Token for SAIBEP20Token...', netId);
+          saiTokenAddress = SaiBEP20Token.networks[currentNetworkId].address;
+          saiToken = new web3.eth.Contract(
+            SaiBEP20Token.abi,
+            saiTokenAddress
+          );
+          setNativeCurrency('BNB');
+        } else {
+          console.log('Setting Token for SAIToken...', netId);
+          saiTokenAddress = SaiToken.networks[currentNetworkId].address;
+          saiToken = new web3.eth.Contract(
+            SaiToken.abi,
+            saiTokenAddress
+          );
+        }
+
         setSaiToken(saiToken);
         let saiBalance = await saiToken.methods
           .balanceOf(currentAccount)
@@ -198,7 +217,7 @@ function EthExchange({
           </button>
           {/* <span>{"<"}{">"}</span> */}
           <div className="swapSelector">
-            {"<"} ETH-SAI {">"}
+            {"<"} {nativeCurrency}-SAI {">"}
           </div>
           <button
             type="button"

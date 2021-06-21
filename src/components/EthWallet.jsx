@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, FormControl, InputGroup } from "react-bootstrap";
 import SaiToken from "../contracts_abis/SaiToken.json";
+import SaiBEP20Token from "../contracts_abis/SaiBEP20Token.json";
 import Identicon from "react-identicons";
 import * as Utility from "../utilities/utils";
 
@@ -14,7 +15,10 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
   const [saiToken, setSaiToken] = useState(undefined);
   const [ethBalance, setEthBalance] = useState("0");
   const [message, setMessage] = useState("");
+  const [nativeCurrency, setNativeCurrency] = useState("ETH");
+
   let saiTokenAddress = "";
+  let saiTokenMock = null;
   // let saiToken = null;
   function updateBtn(btne, status) {
     console.log("btne:", btne);
@@ -96,11 +100,23 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
           setProvider(web3.givenProvider);
           // console.log("currentNetworkId:", currentNetworkId);
           let netId = await web3.eth.net.getId();
-          saiTokenAddress = SaiToken.networks[netId].address;
-          let saiTokenMock = new web3.eth.Contract(
-            SaiToken.abi,
-            saiTokenAddress
-          );
+          console.log('netId:', netId,typeof netId);
+          if(netId != undefined && (netId === 97 || netId === 56)) {
+            console.log('Setting Token for SAIBEP20Token...', netId);
+            saiTokenAddress = SaiBEP20Token.networks[netId].address;
+            saiTokenMock = new web3.eth.Contract(
+              SaiBEP20Token.abi,
+              saiTokenAddress
+            );
+            setNativeCurrency("BNB");
+          } else {
+            console.log('Setting Token for SAIToken...', netId);
+            saiTokenAddress = SaiToken.networks[netId].address;
+            saiTokenMock = new web3.eth.Contract(
+              SaiToken.abi,
+              saiTokenAddress
+            );
+          }
           setSaiToken(saiTokenMock);
           // saiToken = saiTokenMock;
 
@@ -166,7 +182,7 @@ function EthWallet({ web3, currentNetworkId, currentAccount, addressScanUrl }) {
             {/* <Card.Title>SAI Token </Card.Title> */}
             <Card.Subtitle className="mb-2 text-muted">
               Balance : <span className="red">{balance} SAI</span>{" "}
-              <span className="red">( {ethBalance} ETH)</span>
+              <span className="red">( {ethBalance} {nativeCurrency})</span>
             </Card.Subtitle>
             <Card.Subtitle>Account</Card.Subtitle>
             {currentAccount ? (
