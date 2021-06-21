@@ -108,8 +108,8 @@ function App() {
         console.log("chianId:", parseInt(chainId));
         // handleChainChanged(chainId);
         ethereum.on("chainChanged", handleChainChanged);
-        if (chainId !== 42 && chainId !== 1337 && chainId !== 3 && chainId !== 4) {
-          setMessage("Please connect to Kovan, Ropsten or Rinkeby Network...");
+        if (chainId !== 42 && chainId !== 1337 && chainId !== 3 && chainId !== 4 && chainId !== 97) {
+          setMessage("Please connect to Kovan, Ropsten, BSC Testnet or Rinkeby Network...");
           return false;
         }
         console.log('networkid:--------------', ethereum.networkVersion);
@@ -244,8 +244,8 @@ function App() {
       </div>
 
       <footer className="footer">
-        &#169; Copyright 2021 (CodeBlocks) - to contact developer email at
-        satyas2099@gmail.com
+        <span>&#169; Copyright 2021 (Decode Blocks)</span>
+        <span>To contact developer email at satyas2099@gmail.com</span>
       </footer>
     </div>
   );

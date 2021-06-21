@@ -16,12 +16,14 @@ module.exports = {
       // confirmations: 2,
       networkCheckTimeout: 1000000,
       timeoutBlocks: 200,
+      skipDryRun: true
     },
     ropsten: {
       provider: () => new HDWalletProvider(mnemonic, `wss://ropsten.infura.io/ws/v3/${INFURA_API_KEY}`), //https://ropsten.infura.io/v3/${INFURA_API_KEY}
       network_id: 3,
       networkCheckTimeout: 1000000,
       timeoutBlocks: 200,
+      skipDryRun: true
       // confirmations: 2,
     },
     kovan: {
@@ -29,6 +31,14 @@ module.exports = {
       network_id: 42,
       networkCheckTimeout: 10000000,
       timeoutBlocks: 300,
+      skipDryRun: true
+    },
+     bsc: {
+      provider: () => new HDWalletProvider(mnemonic, `wss://data-seed-prebsc-1-s1.binance.org:8545`),
+      network_id: 97,
+      networkCheckTimeout: 10000000,
+      timeoutBlocks: 300,
+      skipDryRun: true
     },
   },
   // contracts_directory: './contracts/',

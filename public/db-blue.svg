@@ -1,0 +1,18 @@
+<svg width="360" height="410" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <text transform="matrix(1.62619 0 0 1.96658 -257.549 -242.186)" stroke="#005fbf" font-style="normal" font-weight="normal" xml:space="preserve" text-anchor="start" font-family="serif" font-size="236" id="svg_2" y="307.37661" x="183.25891" stroke-width="15" fill="#005fbf">D</text>
+  <line stroke="#005fbf" stroke-width="30" id="svg_4" y2="248" x2="346" y1="248" x1="12.00001" fill="none"/>
+  <line stroke="#005fbf" id="svg_5" y2="167.5" x2="345.00001" y1="167.5" x1="12" stroke-width="30" fill="none"/>
+  <line stroke="#005fbf" id="svg_6" y2="404.49998" x2="81" y1="7.50001" x1="80" stroke-width="30" fill="none"/>
+  <line stroke="#005fbf" id="svg_8" y2="404.50001" x2="122" y1="7.50003" x1="122" stroke-width="31" fill="none"/>
+  <line id="svg_10" y2="144.5" x2="686" y1="145.5" x1="686" stroke="#ff0000" fill="none"/>
+  <line stroke-width="30" stroke="#005fbf" fill="none" x1="11.49999" y1="208" x2="345.5" y2="207" id="svg_7"/>
+  <line fill="none" stroke="#bf0000" stroke-width="20" x1="849.5" y1="103" x2="849.5" y2="102" id="svg_9"/>
+  <line fill="none" stroke="#bf0000" stroke-width="20" x1="839.5" y1="270" x2="840.5" y2="270" id="svg_11"/>
+  <line fill="none" stroke="#bf0000" stroke-width="20" x1="844.5" y1="41" x2="845.5" y2="41" id="svg_12"/>
+  <rect fill="#bf0000" stroke="#bf0000" stroke-width="0" x="308.5" y="401" width="1" height="0" id="svg_17"/>
+  <line fill="none" stroke="#bf0000" x1="519.5" y1="345" x2="519.5" y2="344" id="svg_21"/>
+ </g>
+
+</svg>
